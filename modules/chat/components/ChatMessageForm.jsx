@@ -5,11 +5,17 @@ import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Send } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
+import { useAiModels } from '../../ai-agent/hook/ai-agent'
+import ModelSelector from './ModelSelector'
+import { Spinner } from '@/components/ui/spinner'
 
 
 const ChatMessageForm = ({ initialMessage, onmessageChange }) => {
 
-    const [message, setMessage] = useState('')
+    const [message, setMessage] = useState('');
+
+    const { data: models, isPending } = useAiModels();
+    const [selectedModel, setSelectedModel] = useState(models?.models[0].id);
 
 
     useEffect(() => {
@@ -49,11 +55,48 @@ const ChatMessageForm = ({ initialMessage, onmessageChange }) => {
                             }
                         }}
                     />
+
+                    <div className="flex items-center justify-between gap-2 px-3 py-2 border-t ">
+
+                        {/* Model Selector */}
+                        <div>
+                            {
+                                isPending ? (
+                                    <>
+                                        <Spinner />
+                                    </>
+                                ) : (
+                                    <ModelSelector
+                                        models={models?.models}
+                                        selectedModelId={selectedModel}
+                                        onModelSelect={setSelectedModel}
+                                        className="ml-1"
+
+                                    />
+                                )
+                            }
+                        </div>
+
+                        <Button
+                            type="submit"
+                            disabled={!message.trim()}
+                            size="sm"
+                            variant={message.trim() ? "default" : "ghost"}
+                            className="h-8 w-8 p-0 rounded-full "
+                            aria-label="Send message"
+                            title={
+                                message.trim() ? "Send message" : "Enter a message to enable"
+                            }
+                        >
+                            <Send className="h-4 w-4" />
+                            <span className="sr-only">Send message</span>
+                        </Button>
+
+                    </div>
                 </div>
+            </form >
 
-            </form>
-
-        </div>
+        </div >
     )
 }
 
