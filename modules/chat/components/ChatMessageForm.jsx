@@ -8,6 +8,8 @@ import React, { useEffect, useState } from 'react'
 import { useAiModels } from '../../ai-agent/hook/ai-agent'
 import ModelSelector from './ModelSelector'
 import { Spinner } from '@/components/ui/spinner'
+import { useCreateChat } from '../hooks/Chat'
+import { toast } from 'sonner'
 
 
 const ChatMessageForm = ({ initialMessage, onmessageChange }) => {
@@ -15,6 +17,7 @@ const ChatMessageForm = ({ initialMessage, onmessageChange }) => {
     const [message, setMessage] = useState('');
 
     const { data: models, isPending } = useAiModels();
+    const { mutateAsync, isPending: isChatPending } = useCreateChat()
     const [selectedModel, setSelectedModel] = useState(models?.models[0].id);
 
 
@@ -25,17 +28,30 @@ const ChatMessageForm = ({ initialMessage, onmessageChange }) => {
     }, [initialMessage])
 
     const handleSubmit = async (e) => {
-        e.preventDefault();
         try {
-            setMessage('')
-            console.log("Message Sent");
+            e.preventDefault();
+            
+            if (!message.trim()) {
+                toast.error("Message cannot be empty.")
+                return
+            }
 
-        }
-        catch (err) {
-            console.log("ERROR While Sending Message", err);
+            if (!selectedModel) {
+                toast.error("Select a model before sending.")
+                return
+            }
 
+            await mutateAsync({content : message , model : selectedModel})
+            toast.success("Message Sent")
+
+        } catch (error) {
+            console.error("Error sending message:", error);
+            toast.error("Failed to send message");
+        } finally {
+            setMessage("");
         }
-    }
+    };
+
 
     return (
         <div className='w-full max-w-3xl mx-auto px-4 py-6 '>
@@ -79,7 +95,7 @@ const ChatMessageForm = ({ initialMessage, onmessageChange }) => {
 
                         <Button
                             type="submit"
-                            disabled={!message.trim()}
+                            disabled={!message.trim() || isChatPending}
                             size="sm"
                             variant={message.trim() ? "default" : "ghost"}
                             className="h-8 w-8 p-0 rounded-full "
@@ -88,8 +104,18 @@ const ChatMessageForm = ({ initialMessage, onmessageChange }) => {
                                 message.trim() ? "Send message" : "Enter a message to enable"
                             }
                         >
-                            <Send className="h-4 w-4" />
-                            <span className="sr-only">Send message</span>
+                            {
+                                isChatPending ? (
+                                    <>
+                                        <Spinner className={'animate-spin size-4 '} />
+                                    </>
+                                ) : (
+                                    <>
+                                        <Send className="h-4 w-4" />
+                                        <span className="sr-only">Send message</span>
+                                    </>
+                                )
+                            }
                         </Button>
 
                     </div>
