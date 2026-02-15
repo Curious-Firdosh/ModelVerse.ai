@@ -8,25 +8,34 @@ import { signIn } from "@/lib/authClient"
 
 const Page = () => {
   return (
-    <section className="relative flex items-center justify-center min-h-screen bg-gradient-to-br from-black via-zinc-950 to-zinc-900 px-4">
-      
-      {/* Background Glow */}
-      <div className="absolute top-[-100px] left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-blue-600/20 blur-[120px] rounded-full" />
+    <section className="relative flex min-h-screen items-center justify-center bg-background text-foreground px-4 sm:px-6 lg:px-8 transition-colors duration-300">
 
-      <div className="relative w-full max-w-md backdrop-blur-xl bg-white/5 border border-white/10 rounded-2xl shadow-2xl p-8 space-y-8">
-        
+      {/* Glow */}
+      <div className="absolute -top-32 left-1/2 -translate-x-1/2 
+                  w-[400px] h-[400px] 
+                  sm:w-[500px] sm:h-[500px] 
+                  lg:w-[700px] lg:h-[700px] 
+                  bg-blue-500/20 blur-[120px] rounded-full pointer-events-none" />
+
+      <div className="relative w-full max-w-sm sm:max-w-md lg:max-w-lg 
+                  space-y-6 sm:space-y-8 
+                  rounded-2xl border border-border 
+                  bg-card/80 backdrop-blur-xl 
+                  shadow-xl p-6 sm:p-8 lg:p-10 
+                  transition-all duration-300 hover:shadow-2xl">
+
         {/* Logo */}
         <div className="flex justify-center">
           <LogoButton size="default" />
         </div>
 
         {/* Heading */}
-        <div className="text-center space-y-2">
-          <h1 className="text-2xl md:text-3xl font-semibold text-white">
+        <div className="space-y-2 text-center">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-semibold tracking-tight">
             Welcome Back
           </h1>
 
-          <p className="text-zinc-400 text-sm md:text-base">
+          <p className="text-sm sm:text-base text-muted-foreground">
             Step into the future of{" "}
             <span className="bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-500 bg-clip-text text-transparent font-medium">
               AI-powered creation
@@ -35,12 +44,14 @@ const Page = () => {
         </div>
 
         {/* Buttons */}
-        <div className="space-y-4">
+        <div className="space-y-3 sm:space-y-4">
 
-          {/* GitHub */}
           <Button
-            variant="default"
-            className="w-full py-6 rounded-xl bg-white text-black hover:bg-zinc-200 transition font-medium flex items-center justify-center gap-3"
+            className="w-full h-11 sm:h-12 lg:h-13 
+                   rounded-xl flex items-center justify-center gap-3 
+                   font-medium text-sm sm:text-base
+                   transition-all duration-200 
+                   hover:scale-[1.02] hover:shadow-md active:scale-[0.98]"
             onClick={() =>
               signIn.social({
                 provider: "github",
@@ -48,19 +59,17 @@ const Page = () => {
               })
             }
           >
-            <Image
-              src="/git.svg"
-              alt="GitHub"
-              width={22}
-              height={22}
-            />
+            <Image src="/git.svg" alt="GitHub" width={20} height={20} />
             Continue with GitHub
           </Button>
 
-          {/* Google */}
           <Button
             variant="secondary"
-            className="w-full py-6 rounded-xl bg-zinc-900 border border-zinc-700 text-white hover:bg-zinc-800 transition font-medium flex items-center justify-center gap-3"
+            className="w-full h-11 sm:h-12 lg:h-13 
+                   rounded-xl flex items-center justify-center gap-3 
+                   font-medium text-sm sm:text-base
+                   transition-all duration-200 
+                   hover:scale-[1.02] hover:shadow-md active:scale-[0.98]"
             onClick={() =>
               signIn.social({
                 provider: "google",
@@ -68,23 +77,21 @@ const Page = () => {
               })
             }
           >
-            <Image
-              src="/google.svg"
-              alt="Google"
-              width={22}
-              height={22}
-            />
+            <Image src="/google.svg" alt="Google" width={20} height={20} />
             Continue with Google
           </Button>
+
         </div>
 
         {/* Footer */}
-        <p className="text-xs text-center text-zinc-500">
+        <p className="text-xs sm:text-sm text-center text-muted-foreground">
           By continuing, you agree to our Terms & Privacy Policy.
         </p>
 
       </div>
     </section>
+
+
   )
 }
 

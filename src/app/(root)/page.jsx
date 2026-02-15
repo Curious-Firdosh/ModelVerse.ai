@@ -1,9 +1,9 @@
 import { Button } from '@/components/ui/button'
 import React from 'react'
-import UserButton from '../../../modules/authentication/components/user-button'
-import { getCurrentUser } from '../../../modules/authentication/actions'
+import UserButton from '../../modules/authentication/components/user-button'
+import { getCurrentUser } from '../../modules/authentication/actions'
 import { redirect } from 'next/navigation'
-import ChatMessageView from '../../../modules/chat/components/ChatMessageView'
+import ChatMessageView from '../../modules/chat/components/ChatMessageView'
 
 const page = async () => {
 

@@ -1,6 +1,6 @@
 
 import { redirect } from "next/navigation"
-import { requireAuth } from "../../../modules/authentication/actions"
+import { requireAuth } from "../../modules/authentication/actions"
 
 const Authlayout = async ({children}) => {
     
