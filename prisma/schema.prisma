@@ -99,7 +99,7 @@ model Chat {
 
 enum MessageRole {
   USER
-  ASSISTENT
+  ASSISTANT
 }
 
 enum MessageType {

@@ -54,6 +54,19 @@ const extractPartsAsJSON = (message) => {
     return JSON.stringify([{ type: "text", text: content }])
 }
 
+const SYSTEM_UNSUPPORTED_PROVIDERS = [
+    "google/gemma",
+    "google/palm"
+];
+
+const supportsSystemPrompt = (model) => {
+    if (!model) return false;
+
+    return !SYSTEM_UNSUPPORTED_PROVIDERS.some(prefix =>
+        model.startsWith(prefix)
+    );
+};
+
 
 export const POST = async (req) => {
 
@@ -71,7 +84,11 @@ export const POST = async (req) => {
             .filter(msg => msg !== null)
 
 
-        const normalizedNewMessages = Array.isArray(newMessages) ? newMessages : [newMessages];
+        const normalizedNewMessages = Array.isArray(newMessages)
+            ? newMessages
+            : newMessages
+                ? [newMessages]
+                : [];
 
         console.log("📊 Previous messages:", uiMessages.length);
         console.log("📊 New messages:", normalizedNewMessages.length);
@@ -82,7 +99,7 @@ export const POST = async (req) => {
 
         try {
 
-            modelMessages = convertToModelMessages(allUIMessages)
+            modelMessages = await convertToModelMessages(allUIMessages)
             console.log("✅ Converted to model messages:", modelMessages.length);
         }
         catch (conversionError) {
@@ -105,13 +122,16 @@ export const POST = async (req) => {
         const result = streamText({
             model: provider.chat(model),
             messages: modelMessages,
+            ...(supportsSystemPrompt(model) && {
+                system: CHAT_SYSTEM_PROMPT
+            }),
             system: CHAT_SYSTEM_PROMPT
         })
 
         return result.toUIMessageStreamResponse({
             sendReasoning: true,
             originalMessages: allUIMessages,
-            onFinish: ({ responseMessage }) => {
+            onFinish: async ({ responseMessage }) => {
                 try {
                     const messagesToSave = [];
 
@@ -126,7 +146,7 @@ export const POST = async (req) => {
                                 content: userPartsJSON,
                                 messageRole: MessageRole.USER,
                                 model,
-                                messageType: "NORMAL",
+                                messageType: MessageType.NORMAL,
 
                             })
                         }
@@ -141,9 +161,9 @@ export const POST = async (req) => {
                         messagesToSave.push({
                             chatId,
                             content: assistantPartsJSON,
-                            messageRole: MessageRole.ASSISTENT,
+                            messageRole: MessageRole.ASSISTANT,
                             model,
-                            messageType: "NORMAL",
+                            messageType: MessageType.NORMAL,
                         });
                     }
 
@@ -161,10 +181,10 @@ export const POST = async (req) => {
 
     }
     catch (error) {
-         console.error("❌ API Route Error:", error);
-         return NextResponse.json({
-            err : "InternalServer Error While Chatting To Ai ",
-            details: error.toString() 
-         }, 500)
+        console.error("❌ API Route Error:", error);
+        return NextResponse.json({
+            err: "InternalServer Error While Chatting To Ai ",
+            details: error.toString()
+        }, 500)
     }
 }
